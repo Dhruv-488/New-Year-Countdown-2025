@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Year Countdown</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Font for Stylish Text -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('images/imagef.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+        }
+        header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 10px;
+        }
+        header h1 {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+        }
+        nav a {
+            font-family: 'Georgia', serif;
+            font-size: 1rem;
+            margin: 0 8px;
+        }
+        #countdown {
+            font-family: 'Pacifico', cursive;
+            font-size: 7rem;
+            color: #f08204;
+            text-shadow: 2px 2px 8px rgb(49, 65, 212), 1px 1px 4px black;
+            margin-top: 20px;
+        }
+        .last-day-text {
+            font-size: 4rem;
+            margin-top: 10px;
+            color: rgb(31, 77, 175);
+            text-shadow: 1px 1px 3px black;
+        }
+        .happy-new-year {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: gold;
+            text-shadow: 2px 2px 8px red, 1px 1px 6px gold;
+            z-index: 1000;
+        }
+        #fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .floating-box {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        .floating-emojis {
+            display: flex;
+            gap: 10px;
+            animation: float-horizontal 15s linear infinite;
+        }
+        @keyframes float-horizontal {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @media (max-width: 768px) {
+            #countdown { font-size: 2.5rem; }
+            .last-day-text { font-size: 1.5rem; }
+            header h1 { font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            #countdown { font-size: 2rem; }
+            .last-day-text { font-size: 1.2rem; }
+            header h1 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Countdown to 2024 New Year!</h1>
+        <nav>
+            <a href="giftcards.html" class="btn btn-light">Gift Cards</a>
+        </nav>
+    </header>
+    <main>
+        <div id="countdown">Loading...</div>
+        <div class="last-day-text">31 Dec. 2024 - Bye Bye !</div>
+        <canvas id="fireworks"></canvas>
+        <div class="happy-new-year">🎉 Happy New Year! 🎉</div>
+        <div class="floating-box">
+            <div class="floating-emojis">
+                <img src="images/ImageH.gif" alt="Fireworks">
+                <img src="images/imageJ.gif" alt="Confetti">
+                <img src="images/imageO.gif" alt="Confetti">
+                <img src="images/imageP.gif" alt="Confetti">
+                <img src="images/ImageS.gif" alt="Confetti">
+                <img src="images/imageV.gif" alt="Confetti">
+                <img src="images/imageW.gif" alt="Confetti">
+                <img src="images/imageX.gif" alt="Confetti">        
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const countdown = document.getElementById("countdown");
+            const lastDayText = document.querySelector(".last-day-text");
+            const happyNewYearMessage = document.querySelector(".happy-new-year");
+            const fireworksCanvas = document.getElementById("fireworks");
+            const ctx = fireworksCanvas.getContext("2d");
+            const newYear = new Date("December 31, 2024 23:59:59").getTime();
+
+            const resizeCanvas = () => {
+                fireworksCanvas.width = window.innerWidth;
+                fireworksCanvas.height = window.innerHeight;
+            };
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            const updateCountdown = () => {
+                const now = new Date().getTime();
+                const distance = newYear - now;
+
+                if (distance < 0) {
+                    countdown.style.display = "none";
+                    lastDayText.style.display = "none";
+                    happyNewYearMessage.style.display = "block";
+                    startFireworks();
+                    clearInterval(interval);
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdown.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            };
+
+            const startFireworks = () => {
+                const particles = [];
+                const colors = ["red", "gold", "blue", "green", "purple"];
+
+                const createParticle = (x, y) => ({
+                    x, y,
+                    dx: (Math.random() - 0.5) * 4,
+                    dy: (Math.random() - 0.5) * 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    lifetime: 100,
+                });
+
+                const drawParticle = (particle) => {
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+                };
+
+                const animateParticles = () => {
+                    ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+                    if (particles.length < 300) {
+                        particles.push(createParticle(fireworksCanvas.width / 2, fireworksCanvas.height / 2));
+                    }
+
+                    particles.forEach((particle, index) => {
+                        particle.x += particle.dx;
+                        particle.y += particle.dy;
+                        particle.lifetime -= 1;
+                        if (particle.lifetime <= 0) {
+                            particles.splice(index, 1);
+                        } else {
+                            drawParticle(particle);
+                        }
+                    });
+
+                    requestAnimationFrame(animateParticles);
+                };
+
+                animateParticles();
+            };
+
+            const interval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>
